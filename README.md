@@ -32,7 +32,7 @@ A FastAPI-based AI chatbot application that integrates with OpenAI to provide co
 2. Install dependencies:
 
    ```bash
-   pip install -e .
+   uv sync
    ```
 
 3. Create a `.env` file in the project root:
@@ -44,7 +44,7 @@ A FastAPI-based AI chatbot application that integrates with OpenAI to provide co
 ## Running the Server
 
 ```bash
-uvicorn main:app --reload
+uv run fastapi dev main.py
 ```
 
 The API will be available at `http://localhost:8000`. Interactive docs are at `http://localhost:8000/docs`.
