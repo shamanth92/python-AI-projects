@@ -1,0 +1,11 @@
+1. Variables
+2. Strings
+3. Lists
+4. Dictionaries
+5. If Statements
+6. For Loops
+7. Functions
+8. Classes
+9. List Comprehensions
+10. Enumerate Function
+11. Zip Function
