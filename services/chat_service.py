@@ -1,11 +1,5 @@
-import os
-from openai import AsyncOpenAI
-from dotenv import load_dotenv
+from services.openai_client import client
 from services.conversation_service import get_conversation, append_message
-
-load_dotenv()
-
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SYSTEM_PROMPT = {
     "role": "system",
