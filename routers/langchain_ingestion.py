@@ -1,6 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from pathlib import Path
+import chromadb
 from services.langchain_rag_services.rag_ingestion_service import rag_ingestion_service
+
+chroma_client = chromadb.PersistentClient(path="./chroma_db")
+COLLECTION_NAME = "aws-rag-documents"
 
 router = APIRouter(prefix="/langchain/ingestion", tags=["langchain-ingestion"])
 
@@ -26,3 +30,13 @@ def ingest(docs_dir: str = "docs"):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/")
+def delete_all():
+    try:
+        chroma_client.delete_collection(COLLECTION_NAME)
+    except Exception:
+        pass
+    chroma_client.get_or_create_collection(COLLECTION_NAME)
+    return {"message": f"Collection '{COLLECTION_NAME}' cleared"}
