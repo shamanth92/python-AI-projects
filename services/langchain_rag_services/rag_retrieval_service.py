@@ -5,11 +5,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-llm = ChatOpenAI(model="gpt-4o-mini")
+llm = ChatOpenAI(model="gpt-5-mini")
 
-prompt = ChatPromptTemplate.from_template("""
-You are a helpful assistant. Answer the user's question using only the context provided below.
-If the answer is not in the context, say you don't know. You are an AWS Certified AI Practitioner tutor.
+qa_prompt = ChatPromptTemplate.from_template("""
+You are an AWS Certified AI Practitioner tutor. Answer the question using only the context below.
+If the answer is not in the context, say you don't know.
 Provide concise exam-focused explanations. Keep responses under 500 words.
 ----------------
 {context}
@@ -17,8 +17,29 @@ Provide concise exam-focused explanations. Keep responses under 500 words.
 Question: {question}
 """)
 
+exam_prompt = ChatPromptTemplate.from_template("""
+You are an AWS Certified AI Practitioner exam coach. Using the context below, generate exam-style \
+multiple choice questions on the topic the user asks about.
 
-async def generate_answer(question: str) -> str:
+Format each question as:
+Q: <question>
+A) ...
+B) ...
+C) ...
+D) ...
+Answer: <correct option>
+Explanation: <brief explanation>
+
+Generate 3 questions. Base them only on the context provided.
+----------------
+{context}
+----------------
+Topic: {question}
+""")
+
+
+async def generate_answer(question: str, mode: str = "qa") -> str:
+    prompt = exam_prompt if mode == "exam" else qa_prompt  # mode value is the enum's string value
     vector_store = Chroma(
         collection_name="aws-rag-documents",
         embedding_function=embeddings,
