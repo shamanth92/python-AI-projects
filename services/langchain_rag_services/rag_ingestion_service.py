@@ -12,7 +12,7 @@ def rag_ingestion_service(file_path: str):
         chunk_size=1000,
         chunk_overlap=200
     )
-    chunks = text_splitter.split_documents(documents)
+    chunks = [c for c in text_splitter.split_documents(documents) if c.page_content.strip()]
 
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
