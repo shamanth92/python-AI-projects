@@ -3,12 +3,18 @@ from pathlib import Path
 import chromadb
 from services.langchain_rag_services.rag_ingestion_service import rag_ingestion_service
 
+# Separate chromadb client here (distinct from services/rag_services/vector_store_service.py's
+# client) purely for the delete endpoint below -- LangChain's Chroma wrapper
+# doesn't expose collection deletion, so we talk to the underlying chromadb
+# client directly, targeting the same collection name the ingestion service uses.
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 COLLECTION_NAME = "aws-rag-documents"
 
 router = APIRouter(prefix="/langchain/ingestion", tags=["langchain-ingestion"])
 
 
+# Runs the LangChain ingestion pipeline over every PDF in docs_dir, one file
+# at a time (each call embeds+stores that file's chunks immediately).
 @router.post("/")
 def ingest(docs_dir: str = "docs"):
     if not Path(docs_dir).exists():
@@ -32,6 +38,10 @@ def ingest(docs_dir: str = "docs"):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Wipes and recreates the collection so you can re-ingest cleanly (e.g. after
+# fixing a chunking bug) without duplicate-ID errors from old records.
+# delete_collection() raises if the collection doesn't exist yet (e.g. first
+# run before any ingestion) -- that's expected and safely ignored here.
 @router.delete("/")
 def delete_all():
     try:

@@ -5,6 +5,8 @@ from services.rag_services.rag_chat_service import rag_chat
 router = APIRouter(prefix="/chat/rag", tags=["rag-chat"])
 
 
+# Entry point for the basic (non-LangChain) RAG pipeline's Q&A feature.
+# Thin wrapper: all retrieval + prompting logic lives in rag_chat_service.
 @router.post("/", response_model=ChatResponse)
 async def rag_chat_endpoint(request: ChatRequest):
     try:

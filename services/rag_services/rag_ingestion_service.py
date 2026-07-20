@@ -5,6 +5,10 @@ from services.rag_services.vectorization_service import vectorize_chunks
 from services.rag_services.vector_store_service import store_embeddings
 
 
+# Orchestrates the full ingestion pipeline (read -> chunk -> embed -> store)
+# for every PDF in docs_dir. Each file is processed fully end-to-end before
+# moving to the next -- we don't batch multiple files' chunks together, since
+# that would just delay embedding/storage without any real benefit here.
 async def ingest_documents(docs_dir: str = "docs") -> dict:
     pdf_files = list(Path(docs_dir).glob("*.pdf"))
     total_chunks = 0
